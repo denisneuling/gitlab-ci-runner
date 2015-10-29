@@ -38,7 +38,7 @@ public class Launcher {
 
         FileAppender fileAppender = new FileAppender();
         fileAppender.setFile(new File(FileSystem.getInstance().getLogDirectory(), "gitlab-ci-runner.log").getAbsolutePath());
-        fileAppender.setThreshold((Level.INFO);
+        fileAppender.setThreshold(Level.INFO);
         fileAppender.setLayout(new PatternLayout(PATTERN));
         fileAppender.activateOptions();
 
