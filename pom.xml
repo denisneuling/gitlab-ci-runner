@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.metapatrol</groupId>
+    <artifactId>gitlab-ci-runner</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <prerequisites>
+        <maven>3.3.1</maven>
+    </prerequisites>
+
+
+    <repositories>
+        <repository>
+            <id>org.springframework.maven.release</id>
+            <name>Spring Maven Release Repository</name>
+            <url>http://maven.springframework.org/release</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!-- For testing against latest Spring snapshots -->
+        <repository>
+            <id>org.springframework.maven.snapshot</id>
+            <name>Spring Maven Snapshot Repository</name>
+            <url>http://maven.springframework.org/snapshot</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <!-- For developing against latest Spring milestones -->
+        <repository>
+            <id>org.springframework.maven.milestone</id>
+            <name>Spring Maven Milestone Repository</name>
+            <url>http://maven.springframework.org/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>sonatype</id>
+            <name>Sonatype</name>
+            <url>https://oss.sonatype.org/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring-ga</id>
+            <name>spring GA releases</name>
+            <url>http://repo.springsource.org/libs-release/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring-repo</id>
+            <name>Spring Repository</name>
+            <url>http://repo.spring.io/release</url>
+        </repository>
+        <repository>
+            <id>spring-milestone</id>
+            <name>Spring Milestone Repository</name>
+            <url>http://repo.spring.io/milestone</url>
+        </repository>
+        <repository>
+            <id>spring-snapshot</id>
+            <name>Spring Snapshot Repository</name>
+            <url>http://repo.spring.io/snapshot</url>
+        </repository>
+        <repository>
+            <id>jfrog-plugins</id>
+            <name>jfrog-plugins-dist</name>
+            <url>http://repo.jfrog.org/artifactory/plugins-releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <properties>
+
+        <!-- COMMON -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <encoding>UTF-8</encoding>
+        <source.version>1.7</source.version>
+        <target.version>1.7</target.version>
+
+        <!-- PLUGINS -->
+        <build.helper.maven.plugin.version>1.8</build.helper.maven.plugin.version>
+        <com.bazaarvoice.maven.plugins.s3.upload.maven.plugin.version>1.1</com.bazaarvoice.maven.plugins.s3.upload.maven.plugin.version>
+        <maven.apt.plugin.version>1.0.4</maven.apt.plugin.version>
+        <maven.assembly.plugin.version>2.4</maven.assembly.plugin.version>
+        <maven.clean.plugin.version>2.5</maven.clean.plugin.version>
+        <maven.compiler.plugin.version>3.3</maven.compiler.plugin.version>
+        <maven.dependency.plugin.version>2.8</maven.dependency.plugin.version>
+        <maven.deploy.plugin.version>2.7</maven.deploy.plugin.version>
+        <maven.install.plugin.version>2.5.1</maven.install.plugin.version>
+        <maven.jar.plugin.version>2.4</maven.jar.plugin.version>
+        <maven.resources.plugin.version>2.6</maven.resources.plugin.version>
+        <maven.shade.plugin.version>2.0</maven.shade.plugin.version>
+        <maven.war.plugin.version>2.3</maven.war.plugin.version>
+        <maven.release.plugin.version>2.4.1</maven.release.plugin.version>
+        <maven.shade.plugin.version>2.1</maven.shade.plugin.version>
+
+        <!-- DEPENDENCIES -->
+        <c3p0.version>0.9.1.2</c3p0.version>
+        <cglib.version>2.2.2</cglib.version>
+        <com.fasterxml.jackson.version>2.3.3</com.fasterxml.jackson.version>
+        <com.fasterxml.jackson.core.version>2.3.3</com.fasterxml.jackson.core.version>
+        <com.github.jknack.handlebars.version>2.2.2</com.github.jknack.handlebars.version>
+        <com.google.api.client.version>1.18.0-rc</com.google.api.client.version>
+        <com.google.code.gson.version>2.2.4</com.google.code.gson.version>
+        <commons.io.version>2.4</commons.io.version>
+        <commons.codec.version>1.9</commons.codec.version>
+        <commons.lang.version>2.6</commons.lang.version>
+        <com.mysema.querydsl.version>3.6.0</com.mysema.querydsl.version>
+        <javassist.version>3.12.1.GA</javassist.version>
+        <javax.mail.version>1.4.7</javax.mail.version>
+        <javax.persistence.version>1.0.2</javax.persistence.version>
+        <javax.servlet.api.version>2.5</javax.servlet.api.version>
+        <!-- <javax.servlet.api.version>3.1.0</javax.servlet.api.version> -->
+        <javax.validation.version>1.1.0.Final</javax.validation.version>
+        <javax.faces.jsf.api.version>2.1</javax.faces.jsf.api.version>
+        <jstl.jstl.version>1.2</jstl.jstl.version>
+        <log4j.version>1.2.17</log4j.version>
+        <mysql.version>5.1.24</mysql.version>
+        <net.sf.json-lib.version>2.4</net.sf.json-lib.version>
+        <org.apache.activemq.version>5.7.0</org.apache.activemq.version>
+        <org.apache.commons.exec.version>1.1</org.apache.commons.exec.version>
+        <org.apache.httpcomponents.httpclient.version>4.3</org.apache.httpcomponents.httpclient.version>
+        <org.apache.mina.version>2.0.7</org.apache.mina.version>
+        <org.apache.tomcat.version>7.0.40</org.apache.tomcat.version>
+        <org.apache.velocity.tools.version>2.0</org.apache.velocity.tools.version>
+        <org.apache.velocity.version>1.7</org.apache.velocity.version>
+        <org.aspectj.version>1.7.1</org.aspectj.version>
+        <org.codehaus.jackson.version>1.9.11</org.codehaus.jackson.version>
+
+        <!-- requires java 1.7 -->
+        <org.eclipse.jetty.version>9.0.6.v20130930</org.eclipse.jetty.version>
+        <!-- requires java 1.6 -->
+        <!-- <org.eclipse.jetty.version>7.4.5.v20110725</org.eclipse.jetty.version> -->
+
+        <org.hibernate.search.version>4.2.15.Final</org.hibernate.search.version>
+        <!-- <org.hibernate.validator.version>4.3.1.Final</org.hibernate.validator.version> -->
+        <!-- <org.hibernate.validator.version>5.0.0.Final</org.hibernate.validator.version> -->
+        <org.hibernate.validator.version>5.1.2.Final</org.hibernate.validator.version>
+        <org.hibernate.version>4.2.15.Final</org.hibernate.version>
+        <org.hsqldb.version>2.3.2</org.hsqldb.version>
+        <!-- <org.infinispan.spring.version>6.0.2.Final</org.infinispan.spring.version> -->
+        <!-- <org.infinispan.version>6.0.2.Final</org.infinispan.version> -->
+        <org.infinispan.spring.version>5.3.0.Final</org.infinispan.spring.version>
+        <org.infinispan.version>5.3.0.Final</org.infinispan.version>
+
+        <org.jgroups.version>3.3.0.Final</org.jgroups.version>
+        <org.red5.version>1.0.2-SNAPSHOT</org.red5.version>
+        <org.slf4j.version>1.7.12</org.slf4j.version>
+        <org.springframework.data.redis.version>1.0.5.RELEASE</org.springframework.data.redis.version>
+        <org.springframework.integration.version>2.2.5.RELEASE</org.springframework.integration.version>
+        <org.springframework.security.version>3.2.4.RELEASE</org.springframework.security.version>
+
+        <org.springframework.social.core.version>1.1.0.RELEASE</org.springframework.social.core.version>
+        <org.springframework.social.security.version>1.1.0.RELEASE</org.springframework.social.security.version>
+        <org.springframework.social.facebook.version>1.1.1.RELEASE</org.springframework.social.facebook.version>
+        <org.springframework.social.facebook.web.version>1.1.1.RELEASE</org.springframework.social.facebook.web.version>
+        <org.springframework.social.twitter.version>1.1.0.RELEASE</org.springframework.social.twitter.version>
+        <org.springframework.social.google.version>1.0.0.RELEASE</org.springframework.social.google.version>
+
+        <org.springframework.version>3.2.0.RELEASE</org.springframework.version>
+        <!--<org.springframework.version>4.1.7.RELEASE</org.springframework.version>-->
+
+        <pl.project13.maven.git.commit.id.plugin.version>2.1.9</pl.project13.maven.git.commit.id.plugin.version>
+
+        <postgresql.postgresql.version>9.1-901.jdbc4</postgresql.postgresql.version>
+
+        <!-- TEST DEPENDENCIES -->
+        <junit.junit.version>4.11</junit.junit.version>
+        <org.easymock.version>3.2</org.easymock.version>
+        <org.mockito.version>1.9.5</org.mockito.version>
+        <org.powermock.version>1.5.1</org.powermock.version>
+
+
+        <!-- application performance monitoring and tracking -->
+        <com.newrelic.agent.java.version>3.6.0</com.newrelic.agent.java.version>
+
+        <!-- TODO sort -->
+        <commons.fileupload.commons.fileupload.version>1.3.1</commons.fileupload.commons.fileupload.version>
+        <com.amazonaws.aws.java.sdk.version>1.7.12</com.amazonaws.aws.java.sdk.version>
+        <org.imgscalr.imgscalr.lib.version>4.2</org.imgscalr.imgscalr.lib.version>
+
+        <com.twelvemonkeys.imageio.version>3.0.2</com.twelvemonkeys.imageio.version>
+
+        <!-- COMMON -->
+        <runner.clazz>com.metapatrol.gitlab.ci.runner.Launcher</runner.clazz>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven.deploy.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven.clean.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${maven.install.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven.dependency.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${maven.release.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven.resources.plugin.version}</version>
+                    <configuration>
+                        <encoding>${encoding}</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${maven.shade.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build.helper.maven.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.mysema.maven</groupId>
+                    <artifactId>maven-apt-plugin</artifactId>
+                    <version>${maven.apt.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>${maven.war.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>${maven.assembly.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven.jar.plugin.version}</version>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven.dependency.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>copy</goal>
+                            </goals>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>org.eclipse.jetty</groupId>
+                                        <artifactId>jetty-runner</artifactId>
+                                        <version>${org.eclipse.jetty.version}</version>
+                                        <destFileName>jetty-runner.jar</destFileName>
+                                    </artifactItem>
+                                    <artifactItem>
+                                        <groupId>com.newrelic.agent.java</groupId>
+                                        <artifactId>newrelic-agent</artifactId>
+                                        <version>${com.newrelic.agent.java.version}</version>
+                                        <destFileName>newrelic.jar</destFileName>
+                                    </artifactItem>
+                                    <artifactItem>
+                                        <groupId>com.badlogicgames.packr</groupId>
+                                        <artifactId>packr</artifactId>
+                                        <destFileName>packr.jar</destFileName>
+                                        <version>1.1</version>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven.resources.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>copy-resources</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <resources>
+                                    <resource>
+                                        <directory>${basedir}/src/main/webapp/WEB-INF/</directory>
+                                        <includes>
+                                            <include>newrelic.yml</include>
+                                        </includes>
+                                    </resource>
+                                </resources>
+                                <outputDirectory>${basedir}/target/dependency/</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>pl.project13.maven</groupId>
+                    <artifactId>git-commit-id-plugin</artifactId>
+                    <version>${pl.project13.maven.git.commit.id.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>revision</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <dateFormat>dd-MM-yyyy HH:mm:ss z</dateFormat>
+                        <verbose>true</verbose>
+                        <skipPoms>false</skipPoms>
+                        <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                        <prefix>scm.${project.artifactId}.git</prefix>
+                        <generateGitPropertiesFilename>src/main/resources/version/${project.groupId}/${project.artifactId}/git.properties</generateGitPropertiesFilename>
+                        <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                        <skip>false</skip>
+                        <gitDescribe>
+                            <skip>false</skip>
+                            <always>false</always>
+                            <abbrev>7</abbrev>
+                            <dirty>-dirty</dirty>
+                            <forceLongFormat>false</forceLongFormat>
+                        </gitDescribe>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${source.version}</source>
+                    <target>${target.version}</target>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <fork>true</fork>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.handlers</resource>
+                                </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.schemas</resource>
+                                </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>${runner.clazz}</mainClass>
+                                </transformer>
+                            </transformers>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>executable</shadedClassifierName>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${runner.clazz}</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>1.7.12</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.48</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.10</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-client</artifactId>
+            <version>2.7.7</version>
+            <classifier>shaded</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ini4j</groupId>
+            <artifactId>ini4j</artifactId>
+            <version>0.5.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.15</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${org.slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jgit</groupId>
+            <artifactId>org.eclipse.jgit</artifactId>
+            <version>4.1.0.201509280440-r</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <version>1.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars</artifactId>
+            <version>${com.github.jknack.handlebars.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars-markdown</artifactId>
+            <version>${com.github.jknack.handlebars.version}</version>
+        </dependency>
+
+    </dependencies>
+
+</project>

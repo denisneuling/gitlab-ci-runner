@@ -1,0 +1,4 @@
+image: maven:latest
+
+maven:install:
+  script: mvn -B clean install
