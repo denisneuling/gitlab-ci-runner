@@ -241,7 +241,7 @@ public class DockerService {
         final DockerClient client = docker();
 
         try {
-            client.removeContainer(containerId, true);
+            client.removeContainer(containerId);
         }catch(ContainerNotFoundException e){
             // okay
         }
