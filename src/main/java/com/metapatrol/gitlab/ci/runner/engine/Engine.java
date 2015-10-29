@@ -42,7 +42,9 @@ public class Engine implements ApplicationListener<ContextRefreshedEvent>, Dispo
 
     @Bean
     public SimpleAsyncTaskExecutor simpleAsyncTaskExecutor(){
-        return new SimpleAsyncTaskExecutor();
+        return new SimpleAsyncTaskExecutor(
+
+        );
     }
 
     public void start(){
