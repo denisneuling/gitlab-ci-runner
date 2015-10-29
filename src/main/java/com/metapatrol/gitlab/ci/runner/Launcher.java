@@ -10,11 +10,14 @@ import com.metapatrol.gitlab.ci.runner.entrypoint.EntryPoint;
 import com.metapatrol.gitlab.ci.runner.entrypoint.GitlabCIRunnerEntryPoint;
 import com.metapatrol.gitlab.ci.runner.entrypoint.RegisterEntryPoint;
 import com.metapatrol.gitlab.ci.runner.entrypoint.StartEntryPoint;
+import com.metapatrol.gitlab.ci.runner.fs.FileSystem;
 import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,13 +27,21 @@ import java.util.Map;
 public class Launcher {
 
     static {
+        //String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} [%-5p] [%4.4X{threadCount}] [%18.18t] %C{1}#%M():%L %m%n";
+        String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} [%-5p] %X{build}%X{project}%X{sha}%m%n";
+        //String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n";
+
+        FileSystem.getInstance().getLogDirectory();
         ConsoleAppender console = new ConsoleAppender(); //create appender
-        //configure the appender
-        //String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} [%-5p] %C{1}#%M():%L %m%n";
-        String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n";
         console.setLayout(new PatternLayout(PATTERN));
         console.setThreshold(Level.INFO);
         console.activateOptions();
+
+        FileAppender fileAppender = new FileAppender();
+        fileAppender.setFile(new File(FileSystem.getInstance().getLogDirectory(), "gitlab-ci-runner.log").getAbsolutePath());
+        fileAppender.setThreshold(Level.INFO);
+        fileAppender.setLayout(new PatternLayout(PATTERN));
+        fileAppender.activateOptions();
 
         Logger.getLogger("com.google").setLevel(Level.ERROR);
         Logger.getLogger("com.beust").setLevel(Level.ERROR);
@@ -41,6 +52,7 @@ public class Launcher {
         Logger.getLogger("com.metapatrol.gitlab.ci.runner.client").setLevel(Level.ERROR);
 
         Logger.getRootLogger().addAppender(console);
+        Logger.getRootLogger().addAppender(fileAppender);
     }
 
     private static Map<String, CommandHolder> holderMap = new HashMap<String, CommandHolder>();

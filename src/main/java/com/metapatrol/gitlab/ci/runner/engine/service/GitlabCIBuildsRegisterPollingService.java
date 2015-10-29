@@ -1,5 +1,7 @@
 package com.metapatrol.gitlab.ci.runner.engine.service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.metapatrol.gitlab.ci.runner.client.GitlabCIClient;
 import com.metapatrol.gitlab.ci.runner.client.messages.common.HttpStatus;
 import com.metapatrol.gitlab.ci.runner.client.messages.request.RegisterBuildRequest;
@@ -11,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author Denis Neuling (denisneuling@gmail.com)
@@ -28,9 +33,6 @@ public class GitlabCIBuildsRegisterPollingService {
     @Autowired
     private EventService eventService;
 
-    @Autowired
-    private SimpleAsyncTaskExecutor simpleAsyncTaskExecutor;
-
     public GitlabCIClient gitlabCIClient(){
         return new GitlabCIClient(runnerConfigurationProvider.get().getUrl());
     }
@@ -44,12 +46,11 @@ public class GitlabCIBuildsRegisterPollingService {
 
             HttpStatus status = HttpStatus.getStatus(registerBuildResponse.getStatusCode());
             if(!status.isError()) {
-                simpleAsyncTaskExecutor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        eventService.sendTriggerBuildEvent(registerBuildResponse.getPayload());
-                    }
-                });
+                if(log.isDebugEnabled()) {
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    log.debug(gson.toJson(gson.fromJson(registerBuildResponse.getResult(), Map.class)));
+                }
+                eventService.sendTriggerBuildEvent(registerBuildResponse.getPayload());
             }else{
                 stateMachine.release();
             }

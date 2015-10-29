@@ -1,20 +1,34 @@
 package com.metapatrol.gitlab.ci.runner.engine;
 
 import com.metapatrol.gitlab.ci.runner.engine.components.RunnerConfigurationProviderFactoryBean;
+import com.metapatrol.gitlab.ci.runner.engine.threads.BuilderThread;
+import com.metapatrol.gitlab.ci.runner.engine.threads.FlusherThread;
+import com.metapatrol.gitlab.ci.runner.engine.threads.ReaperThread;
+import com.metapatrol.gitlab.ci.runner.engine.threads.ThreadFactory;
 import com.metapatrol.gitlab.ci.runner.etc.Etc;
 import com.metapatrol.gitlab.ci.runner.fs.FileSystem;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.support.ExecutorServiceAdapter;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.quartz.SimpleThreadPoolTaskExecutor;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author Denis Neuling (denisneuling@gmail.com)
@@ -22,7 +36,7 @@ import java.io.IOException;
 @Configuration
 @EnableScheduling
 @ComponentScan(basePackageClasses = Engine.class)
-public class Engine implements ApplicationListener<ContextRefreshedEvent>, DisposableBean{
+public class Engine implements ApplicationListener<ContextRefreshedEvent>{
     private Logger log = Logger.getLogger(getClass());
 
     @Bean
@@ -41,8 +55,27 @@ public class Engine implements ApplicationListener<ContextRefreshedEvent>, Dispo
     }
 
     @Bean
-    public SimpleAsyncTaskExecutor simpleAsyncTaskExecutor(){
-        return new SimpleAsyncTaskExecutor();
+    public SimpleApplicationEventMulticaster applicationEventMulticaster(){
+        SimpleApplicationEventMulticaster simpleApplicationEventMulticaster = new SimpleApplicationEventMulticaster();
+
+        ThreadPoolTaskExecutor simpleApplicationEventMulticasterThreadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+        simpleApplicationEventMulticasterThreadPoolTaskExecutor.setThreadNamePrefix("event-");
+        simpleApplicationEventMulticasterThreadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+        simpleApplicationEventMulticasterThreadPoolTaskExecutor.initialize();
+
+        simpleApplicationEventMulticaster.setTaskExecutor(simpleApplicationEventMulticasterThreadPoolTaskExecutor);
+
+        return simpleApplicationEventMulticaster;
+    }
+
+    @Bean
+    public AsyncTaskExecutor executorService(){
+        SimpleThreadPoolTaskExecutor simpleThreadPoolTaskExecutor = new SimpleThreadPoolTaskExecutor();
+        simpleThreadPoolTaskExecutor.setWaitForJobsToCompleteOnShutdown(true);
+        simpleThreadPoolTaskExecutor.setThreadCount(100);
+        simpleThreadPoolTaskExecutor.setThreadNamePrefix("builder");
+        return simpleThreadPoolTaskExecutor;
+
     }
 
     public void start(){
@@ -55,10 +88,5 @@ public class Engine implements ApplicationListener<ContextRefreshedEvent>, Dispo
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         log.info("Gitlab CI Runner ready and waiting for work.");
-    }
-
-    @Override
-    public void destroy() throws Exception {
-        log.info("Bye.");
     }
 }

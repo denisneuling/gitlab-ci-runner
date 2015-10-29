@@ -6,6 +6,7 @@ import com.metapatrol.gitlab.ci.runner.client.messages.annotation.Method;
 import com.metapatrol.gitlab.ci.runner.client.messages.annotation.Path;
 import com.metapatrol.gitlab.ci.runner.client.messages.common.HttpMethod;
 import com.metapatrol.gitlab.ci.runner.client.messages.payload.api.Payload;
+import com.metapatrol.gitlab.ci.runner.client.messages.payload.request.RegisterBuildRequestPayload;
 import com.metapatrol.gitlab.ci.runner.client.messages.request.api.Request;
 import com.metapatrol.gitlab.ci.runner.client.messages.response.RegisterBuildResponse;
 
@@ -25,18 +26,5 @@ public class RegisterBuildRequest extends Request<RegisterBuildResponse> {
 
     public void setToken(String token) {
         this.registerBuildRequestPayload.setToken(token);
-    }
-
-    public static class RegisterBuildRequestPayload extends Payload {
-        @SerializedName("token")
-        private String token;
-
-        public String getToken() {
-            return token;
-        }
-
-        public void setToken(String token) {
-            this.token = token;
-        }
     }
 }

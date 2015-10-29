@@ -12,10 +12,10 @@ import java.util.List;
 @Parameters(commandNames={"register"})
 public class RegisterCommand extends AbstractBaseCommand {
 
-    @Parameter(names = {"-u","--url"}, description = "URL")
+    @Parameter(names = {"-u","--url"}, description = "URL", required = true)
     private URL url;
 
-    @Parameter(names = {"-t","--token"}, description = "Token")
+    @Parameter(names = {"-t","--token"}, description = "Token", required = true)
     private String token;
 
     @Parameter(names = {"-d","--description"}, description = "Description")

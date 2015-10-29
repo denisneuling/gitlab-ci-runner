@@ -1,7 +1,8 @@
 package com.metapatrol.gitlab.ci.runner.engine.service;
 
+import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.RegisterBuildResponsePayload;
 import com.metapatrol.gitlab.ci.runner.engine.template.TemplateRenderer;
-import com.metapatrol.gitlab.ci.runner.fs.FileSystem;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,34 +17,33 @@ import java.util.List;
  */
 @Service
 public class DockerfileService {
+    private Logger log = Logger.getLogger(getClass());
 
     private static final String DOCKERFILE = "config/Dockerfile.tpl";
 
     @Autowired
     private TemplateRenderer templateRenderer;
 
-    @Autowired
-    private FileSystem fileSystem;
-
-    public File renderDockerFile(File projectBuildDirectory, String image, List<String> adds) {
+    public File renderDockerFile(File projectBuildShaDateDirectory, String image, List<String> adds, List<RegisterBuildResponsePayload.Variable> envs) throws IOException {
 
         Model model = model()
             .put("image", image)
-            .put("adds", adds);
+            .put("adds", adds)
+            .put("envs", envs);
 
         String rendered = null;
         try {
-            rendered = templateRenderer.renderTemplateFromResourceLocation("/config/Dockerfile.tpl", model);
+            rendered = templateRenderer.renderTemplateFromResourceLocation(DOCKERFILE, model);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
-        File dockerfile = new File(projectBuildDirectory.getAbsolutePath(), "Dockerfile");
+        File dockerfile = new File(projectBuildShaDateDirectory.getAbsolutePath(), "Dockerfile");
         PrintWriter writer = null;
-        try {
-            dockerfile.createNewFile();
-            writer = new PrintWriter(dockerfile, "UTF-8");
-        }catch(Throwable throwable){}
+
+        dockerfile.createNewFile();
+        writer = new PrintWriter(dockerfile, "UTF-8");
+
 
         writer.append(rendered);
         writer.flush();

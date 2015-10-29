@@ -1,11 +1,12 @@
 package com.metapatrol.gitlab.ci.runner.engine.listener;
 
-import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.BuildPayload;
+import com.metapatrol.gitlab.ci.runner.client.messages.payload.constants.BuildState;
 import com.metapatrol.gitlab.ci.runner.engine.components.RunnerConfigurationProvider;
 import com.metapatrol.gitlab.ci.runner.engine.components.StateMachine;
 import com.metapatrol.gitlab.ci.runner.engine.events.BuildFinishedEvent;
 import com.metapatrol.gitlab.ci.runner.engine.service.GitlabCIService;
 import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
@@ -28,15 +29,17 @@ public class BuildFinishedEventListener implements ApplicationListener<BuildFini
 
     @Override
     public void onApplicationEvent(BuildFinishedEvent buildFinishedEvent) {
-        BuildPayload buildPayload = buildFinishedEvent.getPayload();
+        MDC.put("project", String.format("[%s] ", buildFinishedEvent.getProjectName()));
+        MDC.put("sha", String.format("[%s] ", buildFinishedEvent.getSha()));
+        MDC.put("build", String.format("[%s] ", buildFinishedEvent.getBuildId()));
 
         if(buildFinishedEvent.isFailed()) {
-            gitlabCIService.updateBuild(buildPayload.getId(), "failed", null);
+            gitlabCIService.updateBuild(buildFinishedEvent.getBuildId(), BuildState.failed, buildFinishedEvent.getTrace());
         }else{
-            gitlabCIService.updateBuild(buildPayload.getId(), "success", null);
+            gitlabCIService.updateBuild(buildFinishedEvent.getBuildId(), BuildState.success, buildFinishedEvent.getTrace());
         }
 
-        log.info("Building " +buildPayload.getProjectName()+" @ " + buildPayload.getSha() + (buildFinishedEvent.isFailed()?" failed.":" succeeded.") + " (Worker "+stateMachine.getRunningBuilds()+" of "+runnerConfigurationProvider.get().getParallelBuilds()+")");
+        log.info("Build " + (buildFinishedEvent.isFailed() ? " failed." : " succeeded."));
 
         stateMachine.release();
     }

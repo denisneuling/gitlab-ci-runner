@@ -1,6 +1,7 @@
 package com.metapatrol.gitlab.ci.runner.engine.listener;
 
-import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.BuildPayload;
+import com.metapatrol.gitlab.ci.runner.client.messages.payload.constants.BuildState;
+import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.RegisterBuildResponsePayload;
 import com.metapatrol.gitlab.ci.runner.engine.components.RunnerConfigurationProvider;
 import com.metapatrol.gitlab.ci.runner.engine.components.StateMachine;
 import com.metapatrol.gitlab.ci.runner.engine.events.BuildTriggerEvent;
@@ -8,6 +9,7 @@ import com.metapatrol.gitlab.ci.runner.engine.service.BuildService;
 import com.metapatrol.gitlab.ci.runner.engine.service.GitlabCIService;
 import com.spotify.docker.client.DockerException;
 import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
@@ -33,11 +35,15 @@ public class BuildTriggerEventListener implements ApplicationListener<BuildTrigg
 
     @Override
     public void onApplicationEvent(BuildTriggerEvent buildTriggerEvent) {
-        BuildPayload buildPayload = buildTriggerEvent.getPayload();
+        MDC.put("project", String.format("[%s] ", buildTriggerEvent.getPayload().getProjectName()));
+        MDC.put("sha", String.format("[%s] ", buildTriggerEvent.getPayload().getSha()));
+        MDC.put("build", String.format("[%s] ", buildTriggerEvent.getPayload().getId()));
 
-        gitlabCIService.updateBuild(buildPayload.getId(), "running", null);
+        RegisterBuildResponsePayload registerBuildResponsePayload = buildTriggerEvent.getPayload();
 
-        log.info("Building "+buildPayload.getProjectName()+" @ " + buildPayload.getSha()+ " ... (Worker "+stateMachine.getRunningBuilds()+" of "+runnerConfigurationProvider.get().getParallelBuilds()+")");
+        gitlabCIService.updateBuild(registerBuildResponsePayload.getId(), BuildState.running, null);
+
+        log.info("Building...");
 
         try {
             buildService.build(buildTriggerEvent.getPayload());

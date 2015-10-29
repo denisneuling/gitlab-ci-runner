@@ -19,6 +19,7 @@ public class DockerNamingUtil {
         }
         if (dockerlike) {
             name = name.replaceAll("/", "_");
+            name = name.replaceAll("\\.", "-");
         }
         if(appendable!=null&&!appendable.isEmpty()){
             name += appendable;

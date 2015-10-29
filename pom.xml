@@ -542,6 +542,11 @@
             <artifactId>spring-context-support</artifactId>
             <version>${org.springframework.version}</version>
         </dependency>
+        <dependency>
+            <groupId>opensymphony</groupId>
+            <artifactId>quartz</artifactId>
+            <version>1.6.2</version>
+        </dependency>
 
         <dependency>
             <groupId>org.eclipse.jgit</groupId>

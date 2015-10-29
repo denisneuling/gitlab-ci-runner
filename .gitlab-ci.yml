@@ -1,4 +1,17 @@
 image: maven:latest
 
+before_script:
+  - env
+
+stages:
+  - build_and_test
+  - fail
+  - deploy
+
 maven:install:
+  stage: build_and_test
   script: mvn -B clean install
+
+deploy:
+  stage: deploy
+  script: echo "slug, upload, unslug, dockerize, run." && mvn clean install ; mvn clean install ; mvn clean install ; mvn clean install ; mvn clean install && sleep 300

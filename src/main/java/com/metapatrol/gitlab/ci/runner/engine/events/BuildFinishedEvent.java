@@ -1,34 +1,44 @@
 package com.metapatrol.gitlab.ci.runner.engine.events;
 
-import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.BuildPayload;
 import org.springframework.context.ApplicationEvent;
 
 /**
  * @author Denis Neuling (denisneuling@gmail.com)
  */
 public class BuildFinishedEvent extends ApplicationEvent {
-    private BuildPayload payload;
     private boolean failed;
-    public BuildFinishedEvent(Object source, BuildPayload payload, boolean failed) {
+    private String trace;
+    private String buildId;
+    private String projectName;
+    private String sha;
+
+    public BuildFinishedEvent(Object source, String buildId, String projectName, String sha, boolean failed, String trace) {
         super(source);
 
-        this.payload = payload;
+        this.buildId = buildId;
+        this.projectName = projectName;
+        this.sha = sha;
         this.failed = failed;
+        this.trace = trace;
     }
 
-    public BuildPayload getPayload() {
-        return payload;
-    }
-
-    public void setPayload(BuildPayload payload) {
-        this.payload = payload;
+    public String getBuildId() {
+        return buildId;
     }
 
     public boolean isFailed() {
         return failed;
     }
 
-    public void setFailed(boolean failed) {
-        this.failed = failed;
+    public String getTrace() {
+        return trace;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public String getSha() {
+        return sha;
     }
 }
