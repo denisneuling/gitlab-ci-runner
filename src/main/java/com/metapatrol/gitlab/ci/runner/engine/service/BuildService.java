@@ -130,7 +130,7 @@ public class BuildService {
 
         String logmessage;
 
-        logmessage = ansi().fg(GREEN).a("$ git clone " + uri.getScheme() + "://" + uri.getHost() + (uri.getPort()!=80&&uri.getPort()!=443?":"+uri.getPort():"") + uri.getPath() + " " + projectBuildDirectory.getAbsolutePath()).reset().toString();
+        logmessage = ansi().fg(GREEN).a("$ git clone " + uri.getScheme() + "://" + uri.getHost() + (uri.getPort()>0&&uri.getPort()!=80&&uri.getPort()!=443?":"+uri.getPort():"") + uri.getPath() + " " + projectBuildDirectory.getAbsolutePath()).reset().toString();
         log.info(logmessage);
         messageHolder.append(logmessage);
         Git git = projectGitService.ensureProjectGitDirectory(projectGitDirectory, uri.toString(), gitProgressStateListener);
