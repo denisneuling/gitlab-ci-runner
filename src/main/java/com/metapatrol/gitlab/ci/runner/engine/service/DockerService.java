@@ -171,8 +171,10 @@ public class DockerService {
     public void startContainer(String containerId) throws DockerException, InterruptedException {
         final DockerClient client = docker();
 
-        HostConfig hostConfig = HostConfig.builder().privileged(true).build();
-        
+        HostConfig hostConfig = HostConfig.builder()
+        //    .privileged(true)
+        .build();
+
         client.startContainer(containerId, hostConfig);
     }
 
