@@ -161,10 +161,10 @@ public class BuildService {
         dockerfileService.renderDockerFile(projectBuildShaDateDirectory, image, adds);
 
 
-        logmessage = ansi().fg(GREEN).a("$ docker build -t " + containerName + " "+projectBuildShaDateAppDirectory.getAbsolutePath()).reset().toString();
+        logmessage = ansi().fg(GREEN).a("$ docker build -t " + containerName + " "+projectBuildShaDateDirectory.getAbsolutePath()).reset().toString();
         log.info(logmessage);
         messageHolder.append(logmessage);
-        String imageId = dockerService.createImage(projectBuildShaDateAppDirectory, containerName, dockerProgressStateListener);
+        String imageId = dockerService.createImage(projectBuildShaDateDirectory, containerName, dockerProgressStateListener);
 
 
         String[] keepAliveCommands = new String[]{
