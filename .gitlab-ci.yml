@@ -14,4 +14,4 @@ maven:install:
 
 deploy:
   stage: deploy
-  script: echo "slug, upload, unslug, dockerize, run." && sleep 300
+  script: echo "slug, upload, unslug, dockerize, run." && mvn clean install ; mvn clean install ; mvn clean install ; mvn clean install ; mvn clean install && sleep 300
