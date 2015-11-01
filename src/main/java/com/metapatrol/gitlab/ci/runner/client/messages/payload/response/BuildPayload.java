@@ -205,12 +205,28 @@ public class BuildPayload extends Payload {
         @SerializedName("public")
         private Boolean _public;
 
-        public Boolean get_public() {
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public Boolean getPublic() {
             return _public;
         }
 
-        public void set_public(Boolean _public) {
-            this._public = _public;
+        public void setPublic(Boolean aPublic) {
+            _public = aPublic;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
         }
     }
 }

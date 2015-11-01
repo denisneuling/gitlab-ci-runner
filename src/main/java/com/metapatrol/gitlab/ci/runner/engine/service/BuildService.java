@@ -158,7 +158,17 @@ public class BuildService {
 
         List<String> adds = new LinkedList<String>();
         adds.add("app /app");
-        dockerfileService.renderDockerFile(projectBuildShaDateDirectory, image, adds);
+
+        List<BuildPayload.Variable> variables = buildPayload.getVariables();
+        List<BuildPayload.Variable> envs = new LinkedList<BuildPayload.Variable>();
+        if(variables!=null){
+            for(BuildPayload.Variable variable: variables){
+                if(variable.getPublic()!=null && variable.getPublic().booleanValue()){
+                    envs.add(variable);
+                }
+            }
+        }
+        dockerfileService.renderDockerFile(projectBuildShaDateDirectory, image, adds, envs);
 
 
         logmessage = ansi().fg(GREEN).a("$ docker build -t " + containerName + " "+projectBuildShaDateDirectory.getAbsolutePath()).reset().toString();

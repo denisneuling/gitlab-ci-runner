@@ -1,5 +1,6 @@
 package com.metapatrol.gitlab.ci.runner.engine.service;
 
+import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.BuildPayload;
 import com.metapatrol.gitlab.ci.runner.engine.template.TemplateRenderer;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,12 @@ public class DockerfileService {
     @Autowired
     private TemplateRenderer templateRenderer;
 
-    public File renderDockerFile(File projectBuildShaDateDirectory, String image, List<String> adds) {
+    public File renderDockerFile(File projectBuildShaDateDirectory, String image, List<String> adds, List<BuildPayload.Variable> envs) {
 
         Model model = model()
             .put("image", image)
-            .put("adds", adds);
+            .put("adds", adds)
+            .put("envs", envs);
 
         String rendered = null;
         try {
