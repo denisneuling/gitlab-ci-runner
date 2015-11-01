@@ -257,12 +257,8 @@ public class BuildService {
         }
 
         if(errorStateHolder.isErrored()){
-            flusher.halt();
-            flusher.flush();
             return false;
         }else{
-            flusher.halt();
-            flusher.flush();
             return true;
         }
     }
@@ -342,10 +338,6 @@ public class BuildService {
         public Flusher(MessageHolder messageHolder, Tracer tracer){
             this.messageHolder = messageHolder;
             this.tracer = tracer;
-        }
-
-        public void halt(){
-            _stop = true;
         }
 
         @Override
