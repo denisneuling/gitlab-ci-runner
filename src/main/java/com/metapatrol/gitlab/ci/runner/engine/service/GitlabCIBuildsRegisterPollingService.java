@@ -45,11 +45,11 @@ public class GitlabCIBuildsRegisterPollingService {
             RegisterBuildRequest registerBuildRequest = new RegisterBuildRequest();
             registerBuildRequest.setToken(runnerConfigurationProvider.get().getToken());
             final RegisterBuildResponse registerBuildResponse = gitlabCIClient().send(registerBuildRequest);
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            log.info(gson.toJson(gson.fromJson(registerBuildResponse.getResult(), Map.class)));
 
             HttpStatus status = HttpStatus.getStatus(registerBuildResponse.getStatusCode());
             if(!status.isError()) {
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                log.info(gson.toJson(gson.fromJson(registerBuildResponse.getResult(), Map.class)));
                 simpleAsyncTaskExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
