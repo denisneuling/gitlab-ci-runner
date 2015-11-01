@@ -98,13 +98,19 @@ public class BuildService {
             public void run() {
                 try {
                     errorStateHolder.setErrored(!buildInternal(buildPayload, errorStateHolder, messageHolder, flusher));
+                    messageHolder.append(ansi().fg(GREEN).a("Build succeeded.").reset().toString());
+                }catch(InterruptedException e){
+                    errorStateHolder.setErrored(true);
+                    log.error(e.getMessage(), e);
+                    messageHolder.append(ansi().fg(RED).a("Build failed. Timed out.").reset().toString());
                 }catch(Throwable throwable){
                     log.error(throwable.getMessage(), throwable);
                     errorStateHolder.setErrored(true);
+                    messageHolder.append(ansi().fg(RED).a("Build failed. "+throwable.getMessage()).reset().toString());
                 }
 
-                futures.reaperFuture.cancel(true);
                 futures.flusherFuture.cancel(true);
+                futures.reaperFuture.cancel(true);
 
                 eventService.sendBuildFinishedEvent(buildPayload, errorStateHolder.isErrored());
             }
