@@ -14,7 +14,7 @@ maven:install:
 
 testfail:
   stage: fail
-  script: false
+  script: 'false'
   allow_failure: true
 
 deploy:
