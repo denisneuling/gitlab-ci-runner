@@ -27,8 +27,8 @@ import java.util.Map;
 public class Launcher {
 
     static {
-        //String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} [%-5p] %C{1}#%M():%L %m%n";
-        String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n";
+        String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} [%-5p] [%18.18t] %C{1}#%M():%L %m%n";
+        //String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n";
 
         FileSystem.getInstance().getLogDirectory();
         ConsoleAppender console = new ConsoleAppender(); //create appender
