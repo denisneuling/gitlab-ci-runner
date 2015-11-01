@@ -168,6 +168,7 @@ public class BuildService {
                 }
             }
         }
+        envs.add(new BuildPayload.Variable("CI_BUILD_REF_NAME", buildPayload.getRef()));
         dockerfileService.renderDockerFile(projectBuildShaDateDirectory, image, adds, envs);
 
 
