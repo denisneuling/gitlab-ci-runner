@@ -1,5 +1,7 @@
 package com.metapatrol.gitlab.ci.runner.engine.service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.metapatrol.gitlab.ci.runner.client.GitlabCIClient;
 import com.metapatrol.gitlab.ci.runner.client.messages.common.HttpStatus;
 import com.metapatrol.gitlab.ci.runner.client.messages.request.RegisterBuildRequest;
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 /**
  * @author Denis Neuling (denisneuling@gmail.com)
@@ -41,6 +45,8 @@ public class GitlabCIBuildsRegisterPollingService {
             RegisterBuildRequest registerBuildRequest = new RegisterBuildRequest();
             registerBuildRequest.setToken(runnerConfigurationProvider.get().getToken());
             final RegisterBuildResponse registerBuildResponse = gitlabCIClient().send(registerBuildRequest);
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            log.info(gson.toJson(gson.fromJson(registerBuildResponse.getResult(), Map.class)));
 
             HttpStatus status = HttpStatus.getStatus(registerBuildResponse.getStatusCode());
             if(!status.isError()) {
