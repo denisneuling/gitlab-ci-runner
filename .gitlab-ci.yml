@@ -1,6 +1,7 @@
 image: maven:latest
 
-before_script: env
+before_script:
+  - env
 
 stages:
   - build_and_test
