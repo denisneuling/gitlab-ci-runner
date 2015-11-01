@@ -68,18 +68,28 @@ public class FileSystem {
         return configurationDirectory;
     }
 
-    public File getProjectBuildDirectory(String projectName, String sha){
+    public File getProjectBuildDirectory(String projectName){
         File base = new File(getBuildDirectory(), projectName);
-        File shaDirectory = new File(base, sha);
-        File projectBuildDirectory = new File(shaDirectory, ""+(new Date().getTime()));
-        projectBuildDirectory.mkdirs();
-        return projectBuildDirectory;
+        base.mkdirs();
+        return base;
     }
 
-    public File getProjectBuildGitDirectory(File projectBuildDirectory){
-        File projectBuildGitDirectory = new File(projectBuildDirectory, "/app");
-        projectBuildGitDirectory.mkdirs();
-        return projectBuildGitDirectory;
+    public File getProjectBuildShaDirectory(File projectBuildDirectory, String sha) {
+        File shaDirectory = new File(projectBuildDirectory, sha);
+        shaDirectory.mkdirs();
+        return shaDirectory;
+    }
+
+    public File getProjectBuildShaDateDirectory(File projectBuildShaDirectory, Date date) {
+        File projectBuildShaDateDirectory = new File(projectBuildShaDirectory, ""+(date.getTime()));
+        projectBuildShaDateDirectory.mkdirs();
+        return projectBuildShaDateDirectory;
+    }
+
+    public File getProjectBuildShaDateAppDirectory(File projectBuildShaDateDirectory) {
+        File projectBuildShaDateAppDirectory = new File(projectBuildShaDateDirectory, "/app");
+        projectBuildShaDateAppDirectory.mkdirs();
+        return projectBuildShaDateAppDirectory;
     }
 
     public File getProjectGitDirectory(String projectName){
@@ -92,5 +102,12 @@ public class FileSystem {
 
     public File getSourceDirectory() {
         return sourceDirectory;
+    }
+
+    public File getProjectGitShaDirectory(String projectName, String sha) {
+        File base = new File(getBuildDirectory(), projectName);
+        File shaDirectory = new File(base, sha);
+        shaDirectory.mkdirs();
+        return shaDirectory;
     }
 }

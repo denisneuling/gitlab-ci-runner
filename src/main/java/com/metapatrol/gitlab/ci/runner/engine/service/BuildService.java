@@ -118,29 +118,36 @@ public class BuildService {
 
         URI uri = URI.create(buildPayload.getRepositoryURL());
         String projectName = DockerNamingUtil.nameFromURI(uri, null, false);
-        String containerName = DockerNamingUtil.nameFromURI(uri, "_"+buildPayload.getSha()+"_"+new Date().getTime(), true);
+        String containerName = DockerNamingUtil.nameFromURI(uri, "_" + buildPayload.getSha() + "_" + new Date().getTime(), true);
 
         // /source/<projectgroup>/<projectname>
-        File projectGitDirectory = fileSystem.getProjectGitDirectory(projectName);
-        // /builds/<projectgroup>/<projectname>/<sha>/<unixtime>
-        File projectBuildDirectory = fileSystem.getProjectBuildDirectory(projectName, buildPayload.getSha());
-        // /builds/<projectgroup>/<projectname>/<sha>/<unixtime>/app
-        File projectBuildGitDirectory = fileSystem.getProjectBuildGitDirectory(projectBuildDirectory);
+        File projectGitSourceDirectory = fileSystem.getProjectGitDirectory(projectName);
 
+        // /builds/<projectgroup>/<projectname>
+        File projectBuildDirectory = fileSystem.getProjectBuildDirectory(projectName);
+
+        // /builds/<projectgroup>/<projectname>/<sha>
+        File projectBuildShaDirectory = fileSystem.getProjectBuildShaDirectory(projectBuildDirectory, buildPayload.getSha());
+
+        // /builds/<projectgroup>/<projectname>/<sha>/<unixtime>
+        File projectBuildShaDateDirectory = fileSystem.getProjectBuildShaDateDirectory(projectBuildShaDirectory, new Date());
+
+        // /builds/<projectgroup>/<projectname>/<sha>/<unixtime>/app
+        File projectBuildShaDateAppDirectory = fileSystem.getProjectBuildShaDateAppDirectory(projectBuildShaDateDirectory);
 
         String logmessage;
 
         logmessage = ansi().fg(GREEN).a("$ git clone " + uri.getScheme() + "://" + uri.getHost() + (uri.getPort()>0&&uri.getPort()!=80&&uri.getPort()!=443?":"+uri.getPort():"") + uri.getPath() + " " + projectBuildDirectory.getAbsolutePath()).reset().toString();
         log.info(logmessage);
         messageHolder.append(logmessage);
-        Git git = projectGitService.ensureProjectGitDirectory(projectGitDirectory, uri.toString(), gitProgressStateListener);
+        Git git = projectGitService.ensureProjectGitDirectory(projectGitSourceDirectory, uri.toString(), gitProgressStateListener);
         git.close();
 
         String sha = buildPayload.getSha();
         logmessage = ansi().fg(GREEN).a("$ git checkout " + sha).reset().toString();
         log.info(logmessage);
         messageHolder.append(logmessage);
-        git = projectBuildGitService.ensureProjectBuildGitDirectory(projectBuildGitDirectory, projectGitDirectory.toURI().toString(), sha, gitProgressStateListener);
+        git = projectBuildGitService.ensureProjectBuildGitDirectory(projectBuildShaDateAppDirectory, projectGitSourceDirectory.toURI().toString(), sha, gitProgressStateListener);
         git.close();
 
         String image = runnerConfigurationProvider.get().getDefaultDockerBuildImage();
@@ -151,13 +158,13 @@ public class BuildService {
 
         List<String> adds = new LinkedList<String>();
         adds.add("app /app");
-        dockerfileService.renderDockerFile(projectBuildDirectory, image, adds);
+        dockerfileService.renderDockerFile(projectBuildShaDateDirectory, image, adds);
 
 
-        logmessage = ansi().fg(GREEN).a("$ docker build -t " + containerName + " "+projectBuildDirectory.getAbsolutePath()).reset().toString();
+        logmessage = ansi().fg(GREEN).a("$ docker build -t " + containerName + " "+projectBuildShaDateAppDirectory.getAbsolutePath()).reset().toString();
         log.info(logmessage);
         messageHolder.append(logmessage);
-        String imageId = dockerService.createImage(projectBuildDirectory, containerName, dockerProgressStateListener);
+        String imageId = dockerService.createImage(projectBuildShaDateAppDirectory, containerName, dockerProgressStateListener);
 
 
         String[] keepAliveCommands = new String[]{
@@ -210,7 +217,7 @@ public class BuildService {
         dockerService.removeImage(imageId);
 
         try {
-            FileUtils.deleteDirectory(projectBuildDirectory);
+            FileUtils.deleteDirectory(projectBuildShaDateDirectory);
         } catch (IOException e) {
             log.warn(e.getMessage());
         }
