@@ -80,7 +80,7 @@ public class DockerService {
         final DockerClient client = docker();
 
         try{
-            client.removeImage(imageId, true, false);
+            client.removeImage(imageId, true, true);
         }catch (InterruptedException e) {
             log.error(e.getMessage(), e);
         } catch (DockerException e) {
