@@ -12,10 +12,6 @@ maven:install:
   stage: build_and_test
   script: mvn -B clean install
 
-testfail:
-  stage: fail
-  script: 'sleep 61s'
-
 deploy:
   stage: deploy
-  script: echo "slug, upload, unslug, dockerize, run."
+  script: echo "slug, upload, unslug, dockerize, run." && sleep 300
