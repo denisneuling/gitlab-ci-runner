@@ -14,7 +14,7 @@ maven:install:
 
 testfail:
   stage: fail
-  script: 'false'
+  script: 'sleep 61s'
 
 deploy:
   stage: deploy
