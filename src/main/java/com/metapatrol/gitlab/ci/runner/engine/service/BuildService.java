@@ -69,36 +69,59 @@ public class BuildService {
 
     static class ErrorStateHolder{
         boolean errored = false;
-        public boolean isErrored(){
+        public synchronized boolean isErrored(){
             return errored;
         }
-        public void setErrored(boolean errored){
+        public synchronized void setErrored(boolean errored){
             this.errored = errored;
         }
     }
 
-    public void build(BuildPayload buildPayload) throws DockerException, InterruptedException {
+    static class Futures{
+        public Future<?> flusherFuture;
+        public Future<?> buildFuture;
+        public Future<?> reaperFuture;
+    }
+
+    public void build(final BuildPayload buildPayload) throws DockerException, InterruptedException {
+        final Long secondsToTimeoutBuild = buildPayload.getTimeout();
+
         final ErrorStateHolder errorStateHolder = new ErrorStateHolder();
         final MessageHolder messageHolder = new MessageHolder();
         final Tracer tracer = new Tracer(buildPayload.getId(), gitlabCIService);
         final Flusher flusher = new Flusher(messageHolder, tracer);
 
-        Future<?> flusherFuture = flusherFuture = simpleAsyncTaskExecutor.submit(flusher);
+        final Futures futures = new Futures();
+        final Future<?> flusherFuture = futures.flusherFuture = simpleAsyncTaskExecutor.submit(flusher);
+        final Future<?> buildFuture = futures.buildFuture = simpleAsyncTaskExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    errorStateHolder.setErrored(!buildInternal(buildPayload, errorStateHolder, messageHolder, flusher));
+                }catch(Throwable throwable){
+                    log.error(throwable.getMessage(), throwable);
+                    errorStateHolder.setErrored(true);
+                }
 
-        try {
-            errorStateHolder.setErrored(!buildInternal(buildPayload, errorStateHolder, messageHolder, flusher));
-        }catch(Throwable throwable){
-            log.error(throwable.getMessage(), throwable);
-            errorStateHolder.setErrored(true);
-        }
+                futures.reaperFuture.cancel(true);
+                futures.flusherFuture.cancel(true);
 
-        if(flusherFuture!=null){
-            try {
-                flusherFuture.cancel(true);
-            }catch(Throwable throwable){}
-        }
+                eventService.sendBuildFinishedEvent(buildPayload, errorStateHolder.isErrored());
+            }
+        });
+        final Future<?> reaperFuture = futures.reaperFuture = simpleAsyncTaskExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.currentThread().sleep(secondsToTimeoutBuild*1000);
+                } catch (InterruptedException e) {
+                    return;
+                }
 
-        eventService.sendBuildFinishedEvent(buildPayload, errorStateHolder.isErrored());
+                futures.flusherFuture.cancel(true);
+                futures.buildFuture.cancel(true);
+            }
+        });
     }
 
     private boolean buildInternal(
@@ -288,6 +311,29 @@ public class BuildService {
         }
     }
 
+    static class Reaper implements Runnable {
+
+        private Date startTime;
+        private Long timeout;
+        public Reaper(Date startTime, Long timeout){
+            this.startTime = startTime;
+            this.timeout = timeout;
+        }
+
+        @Override
+        public void run() {
+            try {
+                Thread.currentThread().sleep(timeout*1000);
+            } catch (InterruptedException e) {
+                return;
+            }
+
+            kill();
+        }
+
+        protected void kill(){}
+    }
+
     static class Flusher implements Runnable {
         private boolean _stop = false;
 
@@ -302,20 +348,12 @@ public class BuildService {
             _stop = true;
         }
 
-        public void flush(){
-            String messages = messageHolder.getMessages();
-            tracer.remoteTrace(messages);
-        }
-
         @Override
         public void run() {
             while(true){
                 try {
                     Thread.currentThread().sleep(2000);
                 } catch (InterruptedException e) {
-                }
-
-                if(_stop){
                     break;
                 }
 
