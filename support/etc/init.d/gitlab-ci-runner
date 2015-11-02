@@ -86,7 +86,7 @@ stop() {
 
  echo -n "Trying to stop registered runners..."
  if [ $RUNNERS_REGISTERED -gt 0 ]; then
-   execute "cat $RUNNERS_PID | xargs kill -9"
+   execute "cat $RUNNERS_PID | xargs kill -15"
    rm -f $RUNNERS_PID
    echo "OK"
  else
@@ -96,7 +96,7 @@ stop() {
 
  if [ $KILL_GHOSTS -eq 1 ]; then
    echo -ne "Trying to kill ghost runners..."
-   ps -C "$PROCESS_NAME" -o "%p" h | xargs kill -USR2
+   ps -C "$PROCESS_NAME" -o "%p" h | xargs kill -15
    [ $? -eq 0 ] && echo "OK"
  else
    echo "No ghost runners have been found.This is good."
