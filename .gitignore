@@ -4,3 +4,4 @@
 *.iml
 target/
 runner.json
+src/main/resources/version/com.metapatrol/gitlab-ci-runner/git.properties
