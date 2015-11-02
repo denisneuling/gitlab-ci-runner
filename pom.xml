@@ -6,7 +6,7 @@
 
     <groupId>com.metapatrol</groupId>
     <artifactId>gitlab-ci-runner</artifactId>
-    <version>1.0.0-rc1</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <scm>
         <url>https://github.com/denisneuling/gitlab-ci-runner</url>
