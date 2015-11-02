@@ -28,3 +28,7 @@ This is a java implementation of the [official gitlab-ci-runner](https://gitlab.
     $ java -jar target/gitlab-ci-runner-*-executable.jar register
     $ java -jar target/gitlab-ci-runner-*-executable.jar start
 ```
+
+# TODO
+
+* Support ***.gitlab-ci.yml#services***
