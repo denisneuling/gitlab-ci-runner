@@ -6,7 +6,7 @@ import com.metapatrol.gitlab.ci.runner.client.messages.payload.api.Payload;
 /**
  * @author Denis Neuling (denisneuling@gmail.com)
  */
-public class RunnerPayload extends Payload{
+public class RegisterRunnerResponsePayload extends Payload{
 
     /*
     {

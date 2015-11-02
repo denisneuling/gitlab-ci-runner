@@ -1,6 +1,6 @@
 package com.metapatrol.gitlab.ci.runner.engine.listener;
 
-import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.BuildPayload;
+import com.metapatrol.gitlab.ci.runner.client.messages.payload.constants.BuildState;
 import com.metapatrol.gitlab.ci.runner.engine.components.RunnerConfigurationProvider;
 import com.metapatrol.gitlab.ci.runner.engine.components.StateMachine;
 import com.metapatrol.gitlab.ci.runner.engine.events.BuildFinishedEvent;
@@ -28,15 +28,13 @@ public class BuildFinishedEventListener implements ApplicationListener<BuildFini
 
     @Override
     public void onApplicationEvent(BuildFinishedEvent buildFinishedEvent) {
-        BuildPayload buildPayload = buildFinishedEvent.getPayload();
-
         if(buildFinishedEvent.isFailed()) {
-            gitlabCIService.updateBuild(buildPayload.getId(), "failed", null);
+            gitlabCIService.updateBuild(buildFinishedEvent.getBuildId(), BuildState.failed, buildFinishedEvent.getTrace());
         }else{
-            gitlabCIService.updateBuild(buildPayload.getId(), "success", null);
+            gitlabCIService.updateBuild(buildFinishedEvent.getBuildId(), BuildState.success, buildFinishedEvent.getTrace());
         }
 
-        log.info("Building " +buildPayload.getProjectName()+" @ " + buildPayload.getSha() + (buildFinishedEvent.isFailed()?" failed.":" succeeded.") + " (Worker "+stateMachine.getRunningBuilds()+" of "+runnerConfigurationProvider.get().getParallelBuilds()+")");
+        log.info("Building " +buildFinishedEvent.getBuildId() +(buildFinishedEvent.isFailed() ? " failed." : " succeeded."));
 
         stateMachine.release();
     }

@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author Denis Neuling (denisneuling@gmail.com)
  */
-public class BuildPayload extends Payload {
+public class RegisterBuildResponsePayload extends Payload {
     /*
     {
        "id":9,

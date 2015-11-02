@@ -1,6 +1,6 @@
 package com.metapatrol.gitlab.ci.runner.engine.service;
 
-import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.BuildPayload;
+import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.RegisterBuildResponsePayload;
 import com.metapatrol.gitlab.ci.runner.engine.template.TemplateRenderer;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class DockerfileService {
     @Autowired
     private TemplateRenderer templateRenderer;
 
-    public File renderDockerFile(File projectBuildShaDateDirectory, String image, List<String> adds, List<BuildPayload.Variable> envs) {
+    public File renderDockerFile(File projectBuildShaDateDirectory, String image, List<String> adds, List<RegisterBuildResponsePayload.Variable> envs) throws IOException {
 
         Model model = model()
             .put("image", image)
@@ -40,12 +40,10 @@ public class DockerfileService {
 
         File dockerfile = new File(projectBuildShaDateDirectory.getAbsolutePath(), "Dockerfile");
         PrintWriter writer = null;
-        try {
-            dockerfile.createNewFile();
-            writer = new PrintWriter(dockerfile, "UTF-8");
-        }catch(Throwable throwable){
-            log.error(throwable.getMessage(), throwable);
-        }
+
+        dockerfile.createNewFile();
+        writer = new PrintWriter(dockerfile, "UTF-8");
+
 
         writer.append(rendered);
         writer.flush();

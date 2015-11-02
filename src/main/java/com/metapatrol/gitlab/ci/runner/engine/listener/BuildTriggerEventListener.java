@@ -1,6 +1,7 @@
 package com.metapatrol.gitlab.ci.runner.engine.listener;
 
-import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.BuildPayload;
+import com.metapatrol.gitlab.ci.runner.client.messages.payload.constants.BuildState;
+import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.RegisterBuildResponsePayload;
 import com.metapatrol.gitlab.ci.runner.engine.components.RunnerConfigurationProvider;
 import com.metapatrol.gitlab.ci.runner.engine.components.StateMachine;
 import com.metapatrol.gitlab.ci.runner.engine.events.BuildTriggerEvent;
@@ -33,11 +34,11 @@ public class BuildTriggerEventListener implements ApplicationListener<BuildTrigg
 
     @Override
     public void onApplicationEvent(BuildTriggerEvent buildTriggerEvent) {
-        BuildPayload buildPayload = buildTriggerEvent.getPayload();
+        RegisterBuildResponsePayload registerBuildResponsePayload = buildTriggerEvent.getPayload();
 
-        gitlabCIService.updateBuild(buildPayload.getId(), "running", null);
+        gitlabCIService.updateBuild(registerBuildResponsePayload.getId(), BuildState.running, null);
 
-        log.info("Building "+buildPayload.getProjectName()+" @ " + buildPayload.getSha()+ " ... (Worker "+stateMachine.getRunningBuilds()+" of "+runnerConfigurationProvider.get().getParallelBuilds()+")");
+        log.info("Building "+ registerBuildResponsePayload.getId()+".");
 
         try {
             buildService.build(buildTriggerEvent.getPayload());

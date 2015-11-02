@@ -56,36 +56,18 @@ public class DockerService {
         return docker;
     }
 
-    public String createImage(File projectBuildDirectory, String containerName, final ProgressStateListener progressStateListener) {
+    public String createImage(File projectBuildDirectory, String containerName, final ProgressStateListener progressStateListener) throws IOException, DockerException, InterruptedException {
         final DockerClient client = docker();
 
-        String imageId = null;
-        try {
-            imageId = client.build(projectBuildDirectory.toPath(), containerName, new ModifiedProgressHandler(progressStateListener), DockerClient.BuildParameter.NO_RM);
-        } catch (DockerException e) {
-            log.error(e.getMessage(), e);
-            progressStateListener.enterState(progressStateListener.fromStdErr(e.getMessage()));
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-            progressStateListener.enterState(progressStateListener.fromStdErr(e.getMessage()));
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            progressStateListener.enterState(progressStateListener.fromStdErr(e.getMessage()));
-        }
+        String imageId = client.build(projectBuildDirectory.toPath(), containerName, new ModifiedProgressHandler(progressStateListener), DockerClient.BuildParameter.NO_RM);
 
         return imageId;
     }
 
-    public void removeImage(String imageId) {
+    public void removeImage(String imageId) throws DockerException, InterruptedException {
         final DockerClient client = docker();
 
-        try{
-            client.removeImage(imageId, true, true);
-        }catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-        } catch (DockerException e) {
-            log.error(e.getMessage(), e);
-        }
+        client.removeImage(imageId, true, true);
     }
 
     static class PullProgress{

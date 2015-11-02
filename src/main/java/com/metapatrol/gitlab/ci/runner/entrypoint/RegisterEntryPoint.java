@@ -6,7 +6,7 @@ import com.metapatrol.gitlab.ci.runner.client.messages.request.RegisterRunnerReq
 import com.metapatrol.gitlab.ci.runner.client.messages.response.RegisterRunnerResponse;
 import com.metapatrol.gitlab.ci.runner.commands.RegisterCommand;
 
-import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.RunnerPayload;
+import com.metapatrol.gitlab.ci.runner.client.messages.payload.response.RegisterRunnerResponsePayload;
 import com.metapatrol.gitlab.ci.runner.configuration.RunnerConfiguration;
 import com.metapatrol.gitlab.ci.runner.etc.Etc;
 import org.apache.log4j.Logger;
@@ -39,7 +39,7 @@ public class RegisterEntryPoint extends EntryPoint<RegisterCommand> {
             return false;
         }
 
-        RunnerPayload payload = registerRunnerResponse.getPayload();
+        RegisterRunnerResponsePayload payload = registerRunnerResponse.getPayload();
 
         RunnerConfiguration runnerConfiguration = new RunnerConfiguration();
         runnerConfiguration.setDescription(command.getDescription());
