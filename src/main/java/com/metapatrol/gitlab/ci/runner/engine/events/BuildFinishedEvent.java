@@ -9,11 +9,15 @@ public class BuildFinishedEvent extends ApplicationEvent {
     private boolean failed;
     private String trace;
     private String buildId;
+    private String projectName;
+    private String sha;
 
-    public BuildFinishedEvent(Object source, String buildId, boolean failed, String trace) {
+    public BuildFinishedEvent(Object source, String buildId, String projectName, String sha, boolean failed, String trace) {
         super(source);
 
         this.buildId = buildId;
+        this.projectName = projectName;
+        this.sha = sha;
         this.failed = failed;
         this.trace = trace;
     }
@@ -28,5 +32,13 @@ public class BuildFinishedEvent extends ApplicationEvent {
 
     public String getTrace() {
         return trace;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public String getSha() {
+        return sha;
     }
 }

@@ -9,6 +9,10 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.RED;
+import static org.fusesource.jansi.Ansi.ansi;
+
 /**
  * @author Denis Neuling (denisneuling@gmail.com)
  */
@@ -21,6 +25,8 @@ public class ReaperThread implements Runnable {
     private EventService eventService;
 
     private transient String buildId;
+    private transient String projectName;
+    private transient String sha;
     private transient Long timeout = 0L;
     private transient ErrorStateHolder errorStateHolder;
     private transient MessageHolder messageHolder;
@@ -57,12 +63,36 @@ public class ReaperThread implements Runnable {
         this.buildId = buildId;
     }
 
+    public String getSha() {
+        return sha;
+    }
+
+    public void setSha(String sha) {
+        this.sha = sha;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
     @Override
     public void run() {
+        if(log.isDebugEnabled()){
+            log.debug("Reaper started.");
+        }
         try {
             doWork();
         } catch (InterruptedException e) {
-            log.info("Reaper killed.");
+            if(log.isDebugEnabled()){
+                log.debug("Reaper killed.");
+            }
+        }
+        if(log.isDebugEnabled()){
+            log.debug("Reaper exited.");
         }
     }
 
@@ -71,6 +101,8 @@ public class ReaperThread implements Runnable {
 
         errorStateHolder.setErrored(true);
 
-        eventService.sendBuildFinishedEvent(buildId, errorStateHolder.isErrored(), messageHolder.getMessages());
+        messageHolder.append(ansi().fg(RED).a("Build timed out.").reset().toString());
+
+        eventService.sendBuildFinishedEvent(buildId, projectName, sha, errorStateHolder.isErrored(), messageHolder.getMessages());
     }
 }

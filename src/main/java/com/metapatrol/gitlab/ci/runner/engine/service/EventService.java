@@ -21,9 +21,9 @@ public class EventService implements ApplicationEventPublisherAware {
         applicationEventPublisher.publishEvent(buildTriggerEvent);
     }
 
-    public void sendBuildFinishedEvent(String buildId, boolean failed, String trace) {
+    public void sendBuildFinishedEvent(String buildId, String projectName, String sha, boolean failed, String trace) {
 
-        BuildFinishedEvent buildFinishedEvent = new BuildFinishedEvent(this, buildId, failed, trace);
+        BuildFinishedEvent buildFinishedEvent = new BuildFinishedEvent(this, buildId, projectName, sha, failed, trace);
         applicationEventPublisher.publishEvent(buildFinishedEvent);
     }
 

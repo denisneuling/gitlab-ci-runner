@@ -211,15 +211,13 @@ public class DockerService {
         try{
             client.stopContainer(containerId, 1);
         }catch(ContainerNotFoundException e){
-        }catch(Throwable throwable){
-            log.error(throwable.getMessage());
+            // okay
         }
 
         try {
             client.killContainer(containerId);
         }catch(ContainerNotFoundException e){
-        }catch(Throwable throwable){
-            log.error(throwable.getMessage());
+            // okay
         }
     }
 

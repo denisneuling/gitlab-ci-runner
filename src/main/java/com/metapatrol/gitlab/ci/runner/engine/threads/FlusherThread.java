@@ -36,11 +36,18 @@ public class FlusherThread implements Runnable {
 
     @Override
     public void run() {
-        log.info("Flusher started.");
+        if(log.isDebugEnabled()){
+            log.debug("Flusher started.");
+        }
         try {
             doWork();
         } catch (InterruptedException e) {
-            log.info("Flusher killed.");
+            if(log.isDebugEnabled()){
+                log.debug("Flusher killed.");
+            }
+        }
+        if(log.isDebugEnabled()){
+            log.debug("Flusher exited.");
         }
     }
 

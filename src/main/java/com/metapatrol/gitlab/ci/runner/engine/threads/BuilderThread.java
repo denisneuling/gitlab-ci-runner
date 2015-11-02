@@ -17,6 +17,7 @@ import com.spotify.docker.client.DockerException;
 import com.spotify.docker.client.messages.ContainerInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,12 +97,20 @@ public class BuilderThread implements Runnable {
 
     @Override
     public void run() {
+        if(log.isDebugEnabled()){
+            log.debug("Builder running.");
+        }
         try{
             doWork();
         }catch (InterruptedException e){
-            log.info("Builder killed.");
+            if(log.isDebugEnabled()){
+                log.debug("Builder killed.");
+            }
+            cleanUp();
         }
-        cleanUp();
+        if(log.isDebugEnabled()){
+            log.debug("Builder exited.");
+        }
     }
 
     // /source/<projectgroup>/<projectname>
@@ -119,6 +128,10 @@ public class BuilderThread implements Runnable {
     private String imageId;
 
     private void doWork() throws InterruptedException {
+        MDC.put("project", String.format("[%s] ", registerBuildResponsePayload.getProjectName()));
+        MDC.put("sha", String.format("[%s] ", registerBuildResponsePayload.getSha()));
+        MDC.put("build", String.format("[%s] ", registerBuildResponsePayload.getId()));
+
         GitProgressStateListener gitProgressStateListener = new GitProgressStateListener(messageHolder);
         DockerProgressStateListener dockerProgressStateListener = new DockerProgressStateListener(messageHolder);
         CommandProgressStateListener commandProgressStateListener = new CommandProgressStateListener(messageHolder, new CommandErrorHandler(){
@@ -262,7 +275,15 @@ public class BuilderThread implements Runnable {
             return;
         }
 
-        eventService.sendBuildFinishedEvent(registerBuildResponsePayload.getId(), errorStateHolder.isErrored(), messageHolder.getMessages());
+        cleanUp();
+
+        eventService.sendBuildFinishedEvent(
+            registerBuildResponsePayload.getId()
+        ,   registerBuildResponsePayload.getProjectName()
+        ,   registerBuildResponsePayload.getSha()
+        ,   errorStateHolder.isErrored()
+        ,   messageHolder.getMessages()
+        );
     }
 
     private void cleanUp(){
@@ -272,7 +293,7 @@ public class BuilderThread implements Runnable {
         try {
             dockerService.stopContainer(containerInfo.id());
         } catch (DockerException e) {
-            e.printStackTrace();
+            // fuck it
         } catch (InterruptedException e) {
             // fuck it
         }
@@ -303,7 +324,7 @@ public class BuilderThread implements Runnable {
         try {
             FileUtils.deleteDirectory(projectBuildShaDateDirectory);
         } catch (IOException e) {
-            log.warn(e.getMessage());
+            // fuck it
         }
     }
 

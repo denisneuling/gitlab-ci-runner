@@ -36,7 +36,7 @@ import java.util.concurrent.ExecutorService;
 @Configuration
 @EnableScheduling
 @ComponentScan(basePackageClasses = Engine.class)
-public class Engine implements ApplicationListener<ContextRefreshedEvent>, DisposableBean{
+public class Engine implements ApplicationListener<ContextRefreshedEvent>{
     private Logger log = Logger.getLogger(getClass());
 
     @Bean
@@ -72,7 +72,7 @@ public class Engine implements ApplicationListener<ContextRefreshedEvent>, Dispo
     public AsyncTaskExecutor executorService(){
         SimpleThreadPoolTaskExecutor simpleThreadPoolTaskExecutor = new SimpleThreadPoolTaskExecutor();
         simpleThreadPoolTaskExecutor.setWaitForJobsToCompleteOnShutdown(true);
-        simpleThreadPoolTaskExecutor.setThreadCount(50);
+        simpleThreadPoolTaskExecutor.setThreadCount(100);
         simpleThreadPoolTaskExecutor.setThreadNamePrefix("builder");
         return simpleThreadPoolTaskExecutor;
 
@@ -88,10 +88,5 @@ public class Engine implements ApplicationListener<ContextRefreshedEvent>, Dispo
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         log.info("Gitlab CI Runner ready and waiting for work.");
-    }
-
-    @Override
-    public void destroy() throws Exception {
-        log.info("Bye.");
     }
 }

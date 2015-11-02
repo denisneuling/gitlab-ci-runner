@@ -9,6 +9,7 @@ import com.metapatrol.gitlab.ci.runner.engine.service.BuildService;
 import com.metapatrol.gitlab.ci.runner.engine.service.GitlabCIService;
 import com.spotify.docker.client.DockerException;
 import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
@@ -34,11 +35,15 @@ public class BuildTriggerEventListener implements ApplicationListener<BuildTrigg
 
     @Override
     public void onApplicationEvent(BuildTriggerEvent buildTriggerEvent) {
+        MDC.put("project", String.format("[%s] ", buildTriggerEvent.getPayload().getProjectName()));
+        MDC.put("sha", String.format("[%s] ", buildTriggerEvent.getPayload().getSha()));
+        MDC.put("build", String.format("[%s] ", buildTriggerEvent.getPayload().getId()));
+
         RegisterBuildResponsePayload registerBuildResponsePayload = buildTriggerEvent.getPayload();
 
         gitlabCIService.updateBuild(registerBuildResponsePayload.getId(), BuildState.running, null);
 
-        log.info("Building "+ registerBuildResponsePayload.getId()+".");
+        log.info("Building...");
 
         try {
             buildService.build(buildTriggerEvent.getPayload());

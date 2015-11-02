@@ -17,7 +17,11 @@ public class ThreadFactory implements ApplicationContextAware{
 
     private ApplicationContext applicationContext;
 
-    public BuilderThread builderThread(final RegisterBuildResponsePayload registerBuildResponsePayload, final ErrorStateHolder errorStateHolder, final MessageHolder messageHolder){
+    public BuilderThread builderThread(
+        final RegisterBuildResponsePayload registerBuildResponsePayload
+    ,   final ErrorStateHolder errorStateHolder
+    ,   final MessageHolder messageHolder
+    ){
         BuilderThread builderThread = applicationContext.getBean(BuilderThread.class);
 
         builderThread.setRegisterBuildResponsePayload(registerBuildResponsePayload);
@@ -27,17 +31,29 @@ public class ThreadFactory implements ApplicationContextAware{
         return builderThread;
     }
 
-    public ReaperThread reaperThread(String buildId, Long timeoutInMs, final MessageHolder messageHolder, final ErrorStateHolder errorStateHolder){
+    public ReaperThread reaperThread(
+        final String buildId
+    ,   final String projectName
+    ,   final String sha
+    ,   final Long timeoutInMs
+    ,   final MessageHolder messageHolder
+    ,   final ErrorStateHolder errorStateHolder
+    ){
         ReaperThread reaperThread = applicationContext.getBean(ReaperThread.class);
         reaperThread.setMessageHolder(messageHolder);
         reaperThread.setErrorStateHolder(errorStateHolder);
         reaperThread.setBuildId(buildId);
+        reaperThread.setProjectName(projectName);
+        reaperThread.setSha(sha);
         reaperThread.setTimeout(timeoutInMs);
 
         return reaperThread;
     }
 
-    public FlusherThread flusherThread(final MessageHolder messageHolder, final Tracer tracer){
+    public FlusherThread flusherThread(
+        final MessageHolder messageHolder
+    ,   final Tracer tracer
+    ){
         FlusherThread flusherThread = applicationContext.getBean(FlusherThread.class);
         flusherThread.setMessageHolder(messageHolder);
         flusherThread.setTracer(tracer);

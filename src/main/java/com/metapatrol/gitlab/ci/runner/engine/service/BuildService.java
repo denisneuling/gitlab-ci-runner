@@ -10,6 +10,7 @@ import com.metapatrol.gitlab.ci.runner.engine.threads.ReaperThread;
 import com.metapatrol.gitlab.ci.runner.engine.threads.ThreadFactory;
 import com.metapatrol.gitlab.ci.runner.engine.components.Tracer;
 import com.spotify.docker.client.DockerException;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -25,6 +26,7 @@ import java.util.concurrent.Future;
  */
 @Service
 public class BuildService  implements DisposableBean, ApplicationListener<BuildFinishedEvent> {
+    private Logger log = Logger.getLogger(getClass());
 
     @Autowired
     private GitlabCIService gitlabCIService;
@@ -39,9 +41,11 @@ public class BuildService  implements DisposableBean, ApplicationListener<BuildF
 
     @Override
     public void destroy() throws Exception {
+        log.info("Cleaning up...");
         for(Futures futures: futureMap.values()){
             futures.cancelAll();
         }
+        log.info("Bye.");
     }
 
     @Override
@@ -68,6 +72,8 @@ public class BuildService  implements DisposableBean, ApplicationListener<BuildF
 
         ReaperThread reaperThread = threadFactory.reaperThread(
             registerBuildResponsePayload.getId()
+        ,   registerBuildResponsePayload.getProjectName()
+        ,   registerBuildResponsePayload.getSha()
         ,   secondsToTimeoutBuild
         ,   messageHolder
         ,   errorStateHolder
