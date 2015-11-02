@@ -1,5 +1,7 @@
 package com.metapatrol.gitlab.ci.runner.engine;
 
+import com.metapatrol.gitlab.ci.runner.configuration.RunnerConfiguration;
+import com.metapatrol.gitlab.ci.runner.engine.components.RunnerConfigurationProvider;
 import com.metapatrol.gitlab.ci.runner.engine.components.RunnerConfigurationProviderFactoryBean;
 import com.metapatrol.gitlab.ci.runner.engine.threads.BuilderThread;
 import com.metapatrol.gitlab.ci.runner.engine.threads.FlusherThread;
@@ -10,6 +12,7 @@ import com.metapatrol.gitlab.ci.runner.fs.FileSystem;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -29,6 +32,7 @@ import org.springframework.scheduling.quartz.SimpleThreadPoolTaskExecutor;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author Denis Neuling (denisneuling@gmail.com)
@@ -69,10 +73,17 @@ public class Engine implements ApplicationListener<ContextRefreshedEvent>{
     }
 
     @Bean
-    public AsyncTaskExecutor executorService(){
+    @Autowired
+    public AsyncTaskExecutor executorService(RunnerConfigurationProvider runnerConfigurationProvider){
         SimpleThreadPoolTaskExecutor simpleThreadPoolTaskExecutor = new SimpleThreadPoolTaskExecutor();
         simpleThreadPoolTaskExecutor.setWaitForJobsToCompleteOnShutdown(true);
-        simpleThreadPoolTaskExecutor.setThreadCount(100);
+
+        RunnerConfiguration runnerConfiguration = runnerConfigurationProvider.get();
+
+        // multiplied by 5 due to buildthread, reaperthread, flusherthread and 2 backoff
+        Integer threadCount = runnerConfiguration.getParallelBuilds() * 5;
+
+        simpleThreadPoolTaskExecutor.setThreadCount(threadCount);
         simpleThreadPoolTaskExecutor.setThreadNamePrefix("builder");
         return simpleThreadPoolTaskExecutor;
 

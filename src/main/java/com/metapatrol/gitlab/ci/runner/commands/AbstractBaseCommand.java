@@ -7,7 +7,10 @@ import com.beust.jcommander.Parameter;
  */
 public abstract class AbstractBaseCommand {
 
-    @Parameter(names = {"-h","--help"}, description = "Help", help = true)
+    @Parameter(names = {"--version"}, description = "Version")
+    private boolean version;
+
+    @Parameter(names = {"--help"}, description = "Help", help = true)
     private boolean help;
 
     public boolean isHelp() {
@@ -16,5 +19,13 @@ public abstract class AbstractBaseCommand {
 
     public void setHelp(boolean help) {
         this.help = help;
+    }
+
+    public boolean isVersion() {
+        return version;
+    }
+
+    public void setVersion(boolean version) {
+        this.version = version;
     }
 }

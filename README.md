@@ -5,8 +5,9 @@ This is a java implementation of the [official gitlab-ci-runner](https://gitlab.
 
 # Prerequisites
 
-* Java
-* Maven
+* [A running GitlabCI instance](https://about.gitlab.com/gitlab-ci/)
+* [Docker](https://www.docker.com/)
+* [Java](https://www.java.com/)
 
 # Installation
 
