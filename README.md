@@ -11,24 +11,28 @@ This is a java implementation of the [official gitlab-ci-runner](https://gitlab.
 
 # Installation
 
-1. Get the code
+1. Get the binary
 
 ```bash
-    $ git clone git@lab.metapatrol.com:metapatrol/gitlab-ci-runner.git
+    $ curl -L https://github.com/denisneuling/gitlab-ci-runner/releases/download/1.0.0-rc1/gitlab-ci-runner-1.0.0-rc1-executable.jar -o gitlab-ci-runner
 ```
 
-2. Compile
+2. Set executable bit
 
 ```bash
-    $ cd gitlab-ci-runner && mvn clean install
+    $ chmod +x gitlab-ci-runner
 ```
 
 3. Run
 
 ```bash
-    $ java -jar target/gitlab-ci-runner-*-executable.jar register
-    $ java -jar target/gitlab-ci-runner-*-executable.jar start
+    $ ./gitlab-ci-runner register
+    $ ./gitlab-ci-runner start
 ```
+
+# Configuration parameters
+
+***TODO***
 
 # TODO
 
