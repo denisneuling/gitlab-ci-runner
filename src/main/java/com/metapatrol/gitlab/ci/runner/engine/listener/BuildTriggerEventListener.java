@@ -35,9 +35,9 @@ public class BuildTriggerEventListener implements ApplicationListener<BuildTrigg
 
     @Override
     public void onApplicationEvent(BuildTriggerEvent buildTriggerEvent) {
-        MDC.put("project", String.format("[%s] ", buildTriggerEvent.getPayload().getProjectName()));
-        MDC.put("sha", String.format("[%s] ", buildTriggerEvent.getPayload().getSha()));
-        MDC.put("build", String.format("[%s] ", buildTriggerEvent.getPayload().getId()));
+        MDC.put("project", String.format("%s ", buildTriggerEvent.getPayload().getProjectName()));
+        MDC.put("sha", String.format("%s ", buildTriggerEvent.getPayload().getSha()));
+        MDC.put("build", String.format("%s ", buildTriggerEvent.getPayload().getId()));
 
         RegisterBuildResponsePayload registerBuildResponsePayload = buildTriggerEvent.getPayload();
 

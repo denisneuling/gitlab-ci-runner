@@ -28,7 +28,7 @@ public class Launcher {
 
     static {
         //String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} [%-5p] [%4.4X{threadCount}] [%18.18t] %C{1}#%M():%L %m%n";
-        String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} [%-5p] %X{build}%X{project}%X{sha}%m%n";
+        String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} %X{build}%X{project}%X{sha}%m%n";
         //String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n";
 
         FileSystem.getInstance().getLogDirectory();
