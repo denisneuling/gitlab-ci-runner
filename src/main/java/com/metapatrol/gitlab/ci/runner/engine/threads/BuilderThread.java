@@ -128,9 +128,9 @@ public class BuilderThread implements Runnable {
     private String imageId;
 
     private void doWork() throws InterruptedException {
-        MDC.put("project", String.format("[%s] ", registerBuildResponsePayload.getProjectName()));
-        MDC.put("sha", String.format("[%s] ", registerBuildResponsePayload.getSha()));
-        MDC.put("build", String.format("[%s] ", registerBuildResponsePayload.getId()));
+        MDC.put("project", String.format("%s ", registerBuildResponsePayload.getProjectName()));
+        MDC.put("sha", String.format("%s ", registerBuildResponsePayload.getSha()));
+        MDC.put("build", String.format("%s ", registerBuildResponsePayload.getId()));
 
         GitProgressStateListener gitProgressStateListener = new GitProgressStateListener(messageHolder);
         DockerProgressStateListener dockerProgressStateListener = new DockerProgressStateListener(messageHolder);

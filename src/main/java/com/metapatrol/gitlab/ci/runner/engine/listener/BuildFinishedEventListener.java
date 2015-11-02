@@ -29,9 +29,9 @@ public class BuildFinishedEventListener implements ApplicationListener<BuildFini
 
     @Override
     public void onApplicationEvent(BuildFinishedEvent buildFinishedEvent) {
-        MDC.put("project", String.format("[%s] ", buildFinishedEvent.getProjectName()));
-        MDC.put("sha", String.format("[%s] ", buildFinishedEvent.getSha()));
-        MDC.put("build", String.format("[%s] ", buildFinishedEvent.getBuildId()));
+        MDC.put("project", String.format("%s ", buildFinishedEvent.getProjectName()));
+        MDC.put("sha", String.format("%s ", buildFinishedEvent.getSha()));
+        MDC.put("build", String.format("%s ", buildFinishedEvent.getBuildId()));
 
         if(buildFinishedEvent.isFailed()) {
             gitlabCIService.updateBuild(buildFinishedEvent.getBuildId(), BuildState.failed, buildFinishedEvent.getTrace());
