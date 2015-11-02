@@ -31,4 +31,4 @@ This is a java implementation of the [official gitlab-ci-runner](https://gitlab.
 
 # TODO
 
-* Support ***.gitlab-ci.yml#services***
+* Support [***.gitlab-ci.yml#services***](http://doc.gitlab.com/ci/yaml/README.html)
