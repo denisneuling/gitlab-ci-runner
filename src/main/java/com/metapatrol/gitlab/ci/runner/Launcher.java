@@ -18,13 +18,20 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author Denis Neuling (denisneuling@gmail.com)
  */
 public class Launcher {
+
+    private static final String PROGRAM = "gitlab-ci-runner";
+
+    private static String programName;
 
     static {
         //String PATTERN = "%d{yyyy-MM-dd HH:mm:ss} [%-5p] [%4.4X{threadCount}] [%18.18t] %C{1}#%M():%L %m%n";
@@ -53,12 +60,29 @@ public class Launcher {
 
         Logger.getRootLogger().addAppender(console);
         Logger.getRootLogger().addAppender(fileAppender);
+
+        Package objPackage = Launcher.class.getPackage();
+        String specificVersion = objPackage.getSpecificationVersion();
+        InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("version/com.metapatrol/gitlab-ci-runner/git.properties");
+        Properties properties = new Properties();
+        String abbrev = null;
+        try {
+            if(inputStream!=null) {
+                properties.load(inputStream);
+                inputStream.close();
+                abbrev = (String) properties.get("scm.gitlab-ci-runner.git.commit.id.abbrev");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        programName = PROGRAM + "/" + specificVersion +(abbrev!=null?" ("+abbrev+")":"");
     }
 
     private static Map<String, CommandHolder> holderMap = new HashMap<String, CommandHolder>();
 
     public static void main(String[] args){
         JCommander jCommander = new JCommander();
+        jCommander.setProgramName(programName);
 
         GitlabCIRunnerCommand gitlabCIRunnerCommand = new GitlabCIRunnerCommand();
         StartCommand startCommand = new StartCommand();
@@ -96,6 +120,11 @@ public class Launcher {
         }
 
         String parsedCommand = jCommander.getParsedCommand();
+        if(gitlabCIRunnerCommand.isVersion()){
+            System.out.println(programName);
+            System.exit(1);
+        }
+
         if(gitlabCIRunnerCommand.isHelp() || parsedCommand == null){
             jCommander.usage();
             System.exit(1);
@@ -104,6 +133,11 @@ public class Launcher {
         CommandHolder commandHolder = holderMap.get(parsedCommand);
         if(commandHolder == null || commandHolder.command.isHelp()){
             jCommander.usage();
+            System.exit(1);
+        }
+
+        if(commandHolder == null || commandHolder.command.isVersion()){
+            System.out.println(programName);
             System.exit(1);
         }
 
